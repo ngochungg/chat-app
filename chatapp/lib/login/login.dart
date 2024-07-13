@@ -16,13 +16,15 @@ class _LoginPageState extends State<LoginPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: const Scaffold(
         resizeToAvoidBottomInset: false,
-        body: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            LoginWidget()
-          ]
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              LoginWidget()
+            ]
+          ),
         ),
       ),
     );
@@ -88,25 +90,90 @@ class LoginWidget extends StatelessWidget {
   }
 }
 
-class FieldTextWidget extends StatelessWidget {
+class FieldTextWidget extends StatefulWidget {
   const FieldTextWidget({super.key});
 
   @override
+  State<FieldTextWidget> createState() => FieldTextState();
+}
+
+class FieldTextState extends State<FieldTextWidget> {
+
+  // Initially password is obscure
+  bool _isObscure = true;
+
+  //Field check
+  final TextEditingController _inputController = TextEditingController();
+  final TextEditingController _inputController2 = TextEditingController();
+  bool enable = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    _inputController2.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    bool _isKeyboard = MediaQuery.of(context).viewInsets.bottom == 0;
+  
     return Column(
       children: [
+        Visibility(
+          visible: !_isKeyboard,
+          maintainAnimation: true,
+          maintainState: true,
+          replacement: const SizedBox.shrink(),
+          child: const Padding(
+            padding: EdgeInsets.only(top: 120.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                width: 259.0,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 20.0),
+                  child: Text(
+                    'Log in with your email or social account',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontFamily: 'Inter-Semibold'
+                    ),
+                  ),
+                ),
+              )
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(bottom: 24.0),
           child: SizedBox(
             width: 343.0,
             height: 50.0,
             child: TextFormField(
-              onTap: () => print('box1'),
+              controller: _inputController,
+              onChanged: (data) {
+                if(_inputController.text.isEmpty ||
+                    _inputController2.text.isEmpty) {
+                      enable = false;
+                    } else {
+                      enable = true;
+                    }
+                    setState(() {});
+              },
               decoration: const InputDecoration(
                 filled: true,
                 fillColor: BoxFill,
                 border: OutlineInputBorder(),
-                hintText: 'Enter your email',
+                hintText: 'Email',
               ),
             ),
           ),
@@ -117,30 +184,59 @@ class FieldTextWidget extends StatelessWidget {
             width: 343.0,
             height: 50.0,
             child: TextFormField(
-              obscureText: true,
+              obscureText: _isObscure,
               enableSuggestions: false,
               autocorrect: false,
-              onTap: () => print('box2'),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              controller: _inputController2,
+              onChanged: (data) {
+                if(_inputController.text.isEmpty ||
+                    _inputController2.text.isEmpty) {
+                      enable = false;
+                    } else {
+                      enable = true;
+                    }
+                    setState(() {});
+              },
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
                 hintText: 'Password',
+                suffix: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                   }, 
+                  child: Text(
+                    _isObscure 
+                  ? 'Show' 
+                  : 'Hide',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Primary,
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                  ),),
+                )
               ),
             ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.only(bottom: 16.0),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
           child: SizedBox(
             width: 343.0,
             height: 48,
             child: ElevatedButton(
-              onPressed: null, 
+              onPressed: enable ? () {} : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: BlueBtn
+              ),
               child: Text(
                 'Login',
                 style: TextStyle(
                   fontFamily: 'Inter-Bold',
                   fontSize: 16.0,
-                  color: LightGrey
+                  color: enable ? Colors.white : LightGrey
                 ),
               ),
             )
@@ -161,29 +257,40 @@ class FieldTextWidget extends StatelessWidget {
             ),
           )
         ),
-        const Padding(
-          padding: EdgeInsets.only(bottom: 16.0),
-          child: TextButton(
-            onPressed: null, 
-            child: Text(
-              'Forgot your password?',
-              style: TextStyle(
-                fontFamily: 'Inter-Semibold',
-                fontSize: 16.0,
-                color: BlueBtn
-              ),
-            )
-          ),
+        const TextButton(
+          onPressed: null, 
+          child: Text(
+            'Forgot your password?',
+            style: TextStyle(
+              fontFamily: 'Inter-Semibold',
+              fontSize: 16.0,
+              color: BlueBtn
+            ),
+          )
         ),
         const SizedBox(
-          width: 74.0,
+          width: 96.0,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(FontAwesomeIcons.facebook, color: FBBlue, size: 25.0),
-              Icon(FontAwesomeIcons.google, color: Colors.red, size: 25.0)
+              IconButton(
+                icon: Icon(
+                  FontAwesomeIcons.facebook,
+                  color: FBBlue, 
+                  size: 25.0, 
+                ),
+                onPressed: null
+              ),
+              IconButton(
+                icon: Icon(
+                  FontAwesomeIcons.google,
+                  color: Colors.red, 
+                  size: 25.0, 
+                ),
+                onPressed: null
+              ),
             ],
           ),
         )
