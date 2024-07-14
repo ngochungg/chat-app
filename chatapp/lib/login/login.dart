@@ -1,3 +1,4 @@
+import 'package:chatapp/signup/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../Common/Colors.dart';
@@ -109,7 +110,6 @@ class FieldTextState extends State<FieldTextWidget> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -242,12 +242,20 @@ class FieldTextState extends State<FieldTextWidget> {
             )
           ),
         ),
-        const SizedBox(
+        SizedBox(
           width: 343.0,
           height: 48,
           child: ElevatedButton(
-            onPressed: null, 
-            child: Text(
+            onPressed: () {
+              Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const SignUpPage())
+                );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GreyBtn
+            ),
+            child: const Text(
               'Create new account',
               style: TextStyle(
                 fontFamily: 'Inter-Bold',
@@ -257,9 +265,9 @@ class FieldTextState extends State<FieldTextWidget> {
             ),
           )
         ),
-        const TextButton(
-          onPressed: null, 
-          child: Text(
+        TextButton(
+          onPressed: () { }, 
+          child: const Text(
             'Forgot your password?',
             style: TextStyle(
               fontFamily: 'Inter-Semibold',
@@ -268,7 +276,7 @@ class FieldTextState extends State<FieldTextWidget> {
             ),
           )
         ),
-        const SizedBox(
+        SizedBox(
           width: 96.0,
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -276,20 +284,20 @@ class FieldTextState extends State<FieldTextWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconButton(
-                icon: Icon(
+                icon: const Icon(
                   FontAwesomeIcons.facebook,
                   color: FBBlue, 
                   size: 25.0, 
                 ),
-                onPressed: null
+                onPressed: () {}
               ),
               IconButton(
-                icon: Icon(
+                icon: const Icon(
                   FontAwesomeIcons.google,
                   color: Colors.red, 
                   size: 25.0, 
                 ),
-                onPressed: null
+                onPressed: () {}
               ),
             ],
           ),
