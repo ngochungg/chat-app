@@ -1,6 +1,8 @@
 import 'package:chatapp/signup/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../auth/auth.dart';
 import '../Common/Colors.dart';
 
 class LoginPage extends StatefulWidget {
@@ -106,7 +108,15 @@ class FieldTextState extends State<FieldTextWidget> {
   //Field check
   final TextEditingController _inputController = TextEditingController();
   final TextEditingController _inputController2 = TextEditingController();
+
+  //show/hide password btn
   bool enable = false;
+
+  //check login
+  bool isLogin = true;
+
+  //errorMessage
+  String? errorMessage = '';
 
   @override
   void initState() {
@@ -118,6 +128,19 @@ class FieldTextState extends State<FieldTextWidget> {
     _inputController.dispose();
     _inputController2.dispose();
     super.dispose();
+  }
+
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      await Auth().signInWithEmailAndPassword(
+        email: _inputController.text, 
+        password: _inputController2.text
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
   }
 
   @override
@@ -160,6 +183,15 @@ class FieldTextState extends State<FieldTextWidget> {
             height: 50.0,
             child: TextFormField(
               controller: _inputController,
+              validator: (val) {
+                if (val!.isEmpty) {
+                  return 'Enter your Email address';
+                } else if (!RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(val)) {
+                  return 'Enter a Valid Email address';
+                } else {
+                  return null;
+                }
+              },
               onChanged: (data) {
                 if(_inputController.text.isEmpty ||
                     _inputController2.text.isEmpty) {
@@ -190,7 +222,8 @@ class FieldTextState extends State<FieldTextWidget> {
               controller: _inputController2,
               onChanged: (data) {
                 if(_inputController.text.isEmpty ||
-                    _inputController2.text.isEmpty) {
+                    _inputController2.text.isEmpty ||
+                    _inputController2.text.length < 6) {
                       enable = false;
                     } else {
                       enable = true;
